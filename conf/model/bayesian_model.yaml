@@ -1,0 +1,2 @@
+# @package model_kwargs
+model_type: bayesian_unigram

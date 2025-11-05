@@ -1,0 +1,6 @@
+# @package _global_
+
+setting: balls-and-urns
+num_dims: 3
+num_tasks: inf
+task_prior: uniform

@@ -1,0 +1,37 @@
+defaults:
+  - setting: balls_and_urns
+  - model: llm
+  - training: default
+  - experiment: small_lm
+  - eval: small_lm_eval
+  - _self_
+
+# Experiment metadata
+name: ??? # Must be set by experiment config
+random_seed: 42
+overwrite: false # Flag for overwriting existing checkpoints
+
+# Hydra configuration - automatic directory naming
+# Hydra multirun configuration
+hydra:
+  mode: MULTIRUN
+  run:
+    dir: ${cache_dir}/${setting}/${name}/${hydra.job.override_dirname:single_run}
+  sweep:
+    dir: ${cache_dir}/${setting}/${name}
+    subdir: ${hydra.job.override_dirname}
+  job:
+    chdir: true
+    config:
+      override_dirname:
+        exclude_keys: ["experiment", "overwrite"]
+  sweeper:
+    _target_: hydra._internal.core_plugins.basic_sweeper.BasicSweeper
+    max_batch_size: null
+
+# Environment variable for cache directory
+cache_dir: ${oc.env:CACHE_DIR}
+
+# Common paths computed from cache_dir
+data_path: ${cache_dir}/${setting}/${name}/data.pt
+run_dir: ${hydra:runtime.output_dir}
