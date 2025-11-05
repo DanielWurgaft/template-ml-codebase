@@ -158,15 +158,18 @@ python -m src.code.eval experiment=my_experiment overwrite=true
 After training and evaluation, analyze results in Python:
 
 ```python
-from src.code.analysis_utils import make_results_dfs_from_experiment_dirs
+from src.code.analysis_utils import load_eval_results
 
 # Load experiment results
-df = make_results_dfs_from_experiment_dirs(
-    experiment_base_dir="/path/to/cache/experiments/setting_name",
+df = load_eval_results(
+    setting="balls_and_urns",
     experiment_name="my_experiment"
 )
 
-# Analyze metrics, plot learning curves, etc.
+# Access metrics and configs
+# df contains columns: 'config', 'metrics', 'checkpoint', and any sweep parameters
+# For small_lm: one row per checkpoint
+# For llm/bayes: one row per model configuration
 ```
 
 ## Configuration System
@@ -261,7 +264,7 @@ If you use this template in your research, please cite:
 @software{template_ml_codebase,
   author = {Wurgaft, Daniel},
   title = {Template ML Codebase},
-  year = {2024},
+  year = {2025},
   url = {https://github.com/DanielWurgaft/template-ml-codebase}
 }
 ```

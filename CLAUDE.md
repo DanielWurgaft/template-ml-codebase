@@ -111,8 +111,8 @@ python -m src.code.train name=my_experiment overwrite=false
 
 7. **Analysis Tools** (`src/code/analysis_utils.py`):
 
-   - `make_results_dfs_from_experiment_dirs()`: Load configs from completed experiment directories
-   - `run_evaluation_nn()`: Evaluate trained models and compute metrics
+   - `load_eval_results()`: Load evaluation metrics and configs from completed experiments
+   - Returns DataFrame with columns: 'config', 'metrics', 'checkpoint', and sweep parameters
 
 8. **Plotting** (`src/code/plotting_utils.py`):
 
@@ -149,9 +149,10 @@ python -m src.code.train name=my_experiment overwrite=false
 
 ### Analysis Workflow
 
-- **Post-experiment analysis**: Load completed experiments using `make_results_dfs_from_experiment_dirs()`
-- **No parameter reconstruction**: Directly reads configs from `.hydra/config.yaml` files
-- **Checkpoint evaluation**: `run_evaluation_nn()` loads models and computes metrics across checkpoints
+- **Post-experiment analysis**: Load completed experiments using `load_eval_results(setting, experiment_name)`
+- **Automatic config loading**: Directly reads configs from `config_resolved.yaml` files
+- **Checkpoint handling**: For small_lm, creates one DataFrame row per checkpoint; for LLM/Bayes, one row per config
+- **Sweep parameter parsing**: Automatically extracts parameter values from directory names
 
 ### Data Generation
 
@@ -199,16 +200,19 @@ python -m src.code.eval experiment=my_experiment overwrite=true
 ### Analysis After Training
 
 ```python
-from src.code.analysis_utils import make_results_dfs_from_experiment_dirs
+from src.code.analysis_utils import load_eval_results
 
-# Load experiment results
-df = make_results_dfs_from_experiment_dirs(
-    experiment_base_dir="/cache/experiments/default",
-    experiment_name="default"
+# Load experiment results (automatically loads configs and metrics)
+df = load_eval_results(
+    setting="balls_and_urns",
+    experiment_name="my_experiment"
 )
 
-# Run evaluation
-df = run_evaluation_nn(df, load_saved_evaluation=True)
+# Access results
+# df['config'] - Config objects for each run
+# df['metrics'] - Metrics dict for each checkpoint/config
+# df['checkpoint'] - Training step (None for LLM/Bayes)
+# Additional columns for any sweep parameters
 ```
 
 ### Custom Model Architectures
